@@ -671,15 +671,18 @@ pp.readInvalidTemplateToken = function() {
       break
 
     case "$":
-      if (this.input[this.pos + 1] !== "{") {
-        break
-      }
-
-    // falls through
+      if (this.input[this.pos + 1] !== "{") break
+      // fall through
     case "`":
       return this.finishToken(tt.invalidTemplate, this.input.slice(this.start, this.pos))
 
-    // no default
+    case "\r":
+      if (this.input[this.pos + 1] === "\n") ++this.pos
+      // fall through
+    case "\n": case "\u2028": case "\u2029":
+      ++this.curLine
+      this.lineStart = this.pos + 1
+      break
     }
   }
   this.raise(this.start, "Unterminated template")
@@ -742,6 +745,7 @@ pp.readEscapedChar = function(inTemplate) {
     if (isNewLine(ch)) {
       // Unicode new line characters after \ get removed from output in both
       // template literals and strings
+      if (this.options.locations) { this.lineStart = this.pos; ++this.curLine }
       return ""
     }
     return String.fromCharCode(ch)

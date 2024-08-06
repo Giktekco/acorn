@@ -1,3 +1,5 @@
 decorators
+explicit-resource-management
+regexp-modifiers
 import-assertions
-regexp-duplicate-named-groups
+import-attributes
